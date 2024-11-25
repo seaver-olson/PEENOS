@@ -67,13 +67,6 @@ void kernel_main() {
     }
     success("FAT SYSTEM INITIALIZED\n");
 
-    // Initialize the SD card
-    if (sd_init() != 0) {
-        fail("[ERROR] SD INIT FAILED");
-        return;
-    }
-    success("SD CARD INITIALIZED\n");
-
     // Test SD card write and read
     unsigned char writeBuffer[512] = {0};
     memcpy(writeBuffer, "Test data for SD card write", strlen("Test data for SD card write"));

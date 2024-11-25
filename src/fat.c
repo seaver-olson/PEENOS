@@ -9,12 +9,12 @@ unsigned int root_sector;
 int fatInit() {  
     if (sd_init() != 0) {
         esp_printf(putc, "[WARNING]: SD card initialization failed\n");
-        return 1;
+        return -1;
     }
-    esp_printf(putc,"SD CARD initialized\n");
+    success("SD CARD initialized\n");
     if (sd_readblock(0, bootSector, 1) == 0) {
-        esp_printf(putc, "[WARNING]: Failed to read boot sector\n");
-        return 1;
+        fail("[ERROR]: Failed to read boot sector\n");
+        return -1;
     }
     bs = (struct boot_sector *)bootSector;
     esp_printf(putc, "fs type: "); 

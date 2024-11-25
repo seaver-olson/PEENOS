@@ -1,8 +1,8 @@
 #include "delays.h"
 
-unsigned long get_timer_count(){
-	unsigned long *timer_count_register = (unsigned long *)0x3f003004;
-	return *timer_count_register;
+unsigned long get_timer_count() {
+    volatile unsigned long *timer_count_register = (volatile unsigned long *)0x3f003004;
+    return *timer_count_register;
 }
 
 void wait_msec(unsigned int ms){
