@@ -13,9 +13,7 @@ ODIR = obj
 SDIR = src
 
 OBJS = \
-	exc.o \
-    systimer.o \
-	mailbox.o \
+        systimer.o \
 	boot.o \
 	delays.o \
 	kernel_main.o \
@@ -23,9 +21,7 @@ OBJS = \
 	page.o \
 	rprintf.o \
 	sd.o \
-	list.o \
 	fat.o \
-	color.o \
 
 OBJ = $(patsubst %,$(ODIR)/%,$(OBJS))
 
