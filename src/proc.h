@@ -22,7 +22,7 @@ struct proc {
 	struct proc *parent;
 	void *chan; //if !zero, sleeping on chan
 	int killed; //if !zero, has been killed
-	struct file *ofile[NOFILE]; // opens files
+	//struct file *ofile[NOFILE]; // opens files
 	struct inode *cwd; //current working directory
 	struct context context; //switch here to run process
 	struct trapfram *tf;//trap frame for the current interrupt
