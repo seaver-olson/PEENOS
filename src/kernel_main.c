@@ -45,10 +45,10 @@ void kernel_main() {
     char buffer[512];  // Currently unused; consider removing or utilizing.
 
     // Initialize timer and enable IRQ
-    timer_init(1);
+    if (timer_init(1) != 0) fail("[ERROR] TIMER INIT FAILED"); return;
     asm("msr DAIFClr, #2");
-    success("Timer initialized");
-
+    success("IRQ SETUP");
+    
     // Set up the page table
     if (setupIdentityMap()!=0){
 	fail("[ERROR] MMU INIT FAILED");

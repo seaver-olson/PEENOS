@@ -15,19 +15,14 @@ static char pad_character;
 volatile int *muio_ptr = (volatile int *)(AUX_MU_IO);
 
 void putc(int data){
-	if (muio_ptr != NULL){
-		*muio_ptr = data;
-	}
+   if (muio_ptr != NULL) *muio_ptr = data;
 }
 
 char getc(){
-	char c;
-	while (!(*AUX_MU_LSR&0x01)){
-		asm volatile("nop");
-	}
-	c = (char)(*AUX_MU_IO);
-	if (c=='\r')return '\n';
-	return c;
+	while (!(*AUX_MU_LSR&0x01)) asm volatile("nop");
+	char c = (char)(*AUX_MU_IO);
+	if (c=='\r') return '\n'; 
+   return c;
 }
 
 void logc(int data){
@@ -37,25 +32,18 @@ void logc(int data){
 
 size_t strlen(const char *str) {
     unsigned int len = 0;
-    while(str[len] != '\0') {
-        len++;
-    }
+    while(str[len] != '\0') len++;
     return len;
 }
 
 int tolower(int c) {
-    if(c < 'a') { // Check if c is uppercase
-        c -= 'a' - 'A';
-    }
+    if(c < 'a') c -= 'a' - 'A';
     return c;
 }
 
 int isdig(int c) {
-    if((c >= '0') && (c <= '9')){
-        return 1;
-    } else {
-        return 0;
-    }
+    if((c >= '0') && (c <= '9')) return 1;
+    else return 0;
 }
 
 
