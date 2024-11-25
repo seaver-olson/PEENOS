@@ -13,6 +13,7 @@ ODIR = obj
 SDIR = src
 
 OBJS = \
+        exc.o\
         systimer.o \
 	boot.o \
 	delays.o \

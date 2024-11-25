@@ -45,7 +45,11 @@ void kernel_main() {
     char buffer[512];  // Currently unused; consider removing or utilizing.
 
     // Initialize timer and enable IRQ
-    if (timer_init(1) != 0) fail("[ERROR] TIMER INIT FAILED"); return;
+    if (timer_init(1) != 0){ 
+    	fail("[ERROR] TIMER INIT FAILED"); 
+	return;
+    }
+    success("TIMER SETUP");
     asm("msr DAIFClr, #2");
     success("IRQ SETUP");
     
