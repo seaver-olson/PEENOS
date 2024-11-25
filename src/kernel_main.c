@@ -55,16 +55,10 @@ void kernel_main() {
     
     // Set up the page table
     if (setupIdentityMap()!=0){
-	fail("[ERROR] MMU INIT FAILED");
-	return;
+	    fail("[ERROR] MMU INIT FAILED");
+	    return;
     }
     success("MMU INITIALIZED\n");
-    // Initialize the SD card
-    if (sd_init() != 0) {
-        fail("[ERROR] SD INIT FAILED");
-        return;
-    }
-    success("SD CARD INITIALIZED\n");
 
     // Initialize FAT filesystem
     if (fatInit() != 0) {
@@ -72,6 +66,13 @@ void kernel_main() {
         return;
     }
     success("FAT SYSTEM INITIALIZED\n");
+
+    // Initialize the SD card
+    if (sd_init() != 0) {
+        fail("[ERROR] SD INIT FAILED");
+        return;
+    }
+    success("SD CARD INITIALIZED\n");
 
     // Test SD card write and read
     unsigned char writeBuffer[512] = {0};
