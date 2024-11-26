@@ -181,7 +181,12 @@ int sd_init()
     long r,cnt,ccs=0; // r is for return value, cnt is for timeout counter and ccs is for card capacity
     // GPIO_CD
     r=*GPFSEL4; r&=~(7<<(7*3)); *GPFSEL4=r; // GPIO 47 is input
-    *GPPUD=2; wait_msec(150); *GPPUDCLK1=(1<<15); wait_msec(150); *GPPUD=0; *GPPUDCLK1=0;
+    *GPPUD=2; 
+    wait_msec(150);
+    *GPPUDCLK1=(1<<15);
+    wait_msec(150); 
+    *GPPUD=0; 
+    *GPPUDCLK1=0;
     r=*GPHEN1; r|=1<<15; *GPHEN1=r;
 
     // GPIO_CLK, GPIO_CMD
@@ -193,7 +198,7 @@ int sd_init()
     *GPPUD=2; wait_msec(150);
     *GPPUDCLK1=(1<<18) | (1<<19) | (1<<20) | (1<<21);
     wait_msec(150); *GPPUD=0; *GPPUDCLK1=0;
-    
+   
     sd_hv = (*EMMC_SLOTISR_VER & HOST_SPEC_NUM) >> HOST_SPEC_NUM_SHIFT;
     success("EMMC: GPIO set up\n");
     // Reset the card.
