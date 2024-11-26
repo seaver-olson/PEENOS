@@ -42,8 +42,8 @@ unsigned int getEL() {
 }
 
 void kernel_main() {
-    char buffer[512];  // Currently unused; consider removing or utilizing.
-
+    unsigned char writeBuffer[512];
+    unsigned char readBuffer[512];
     // Initialize timer and enable IRQ
     if (timer_init(1) != 0){ 
     	fail("[ERROR] TIMER INIT FAILED"); 
@@ -68,10 +68,9 @@ void kernel_main() {
     success("FAT SYSTEM INITIALIZED\n");
 
     // Test SD card write and read
-    unsigned char writeBuffer[512] = {0};
+    success("starting");
     memcpy(writeBuffer, "Test data for SD card write", strlen("Test data for SD card write"));
-    unsigned char readBuffer[512] = {0};
-
+    success("prepping for write...");
     if (sd_writeblock(writeBuffer, 0, 1) != 0) {
         fail("[ERROR] SD WRITE FAILED");
         return;

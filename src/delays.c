@@ -1,7 +1,7 @@
 #include "delays.h"
 
 unsigned long get_timer_count() {
-    volatile unsigned long *timer_count_register = (volatile unsigned long *)0x3f003000;
+    volatile unsigned long *timer_count_register = (volatile unsigned long *)0x3f003004;
     return *timer_count_register;
 }
 
