@@ -1,12 +1,16 @@
 #include "delays.h"
+#define TIMER_COUNT_REG (SYSTEM_TIMER_BASE + 0x04)
 
-unsigned long get_timer_count() {
-    volatile unsigned long *timer_count_register = (volatile unsigned long *)0x3f003004;
+volatile unsigned long get_timer_count() {
+    volatile unsigned long *timer_count_register = (volatile unsigned long *)TIMER_COUNT_REG;
     return *timer_count_register;
 }
 
 void wait_msec(unsigned int ms){
-	unsigned long s = get_timer_count();
-	while (get_timer_count() - s < (1000 * ms)){
-	}
+	unsigned long start = get_timer_count();
+	unsigned long wait_ticks = ms * 1000;
+
+	while ((get_timer_count() - start) & 0xFFFFFFFF < wait_ticks){
+	//do nothing please
+        }
 }

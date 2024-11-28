@@ -8,6 +8,20 @@
 extern unsigned char __bss_end;
 extern unsigned char __bss_start;
 
+void test_timer() {
+    esp_printf(putc, "Starting timer test...\n");
+    unsigned long timer_value;
+
+    // Continuously print the timer value every 500 milliseconds
+    for (int i = 0; i < 10; i++) { // Print 10 readings
+        timer_value = get_timer_count();
+        esp_printf(putc, "Timer value: %lu\n", timer_value);
+        wait_msec(500); // Wait 500 ms between readings
+    }
+
+    esp_printf(putc, "Timer test complete.\n");
+}
+
 void clear_bss() {
     unsigned char *begin_bss = &__bss_start;
     unsigned char *end_bss = &__bss_end;
@@ -45,14 +59,15 @@ void kernel_main() {
     unsigned char writeBuffer[512];
     unsigned char readBuffer[512];
     // Initialize timer and enable IRQ
-    if (timer_init(1) != 0){ 
-    	fail("[ERROR] TIMER INIT FAILED"); 
-	return;
-    }
+    timer_setup(1);
     success("TIMER SETUP");
     asm("msr DAIFClr, #2");
     success("IRQ SETUP");
-    
+    test_timer();
+    init_pfa_list();
+    struct ppage *allocd_list = allocate_physical_pages(10);
+    free_physical_pages(allocd_list);
+    success("Page list set up");
     // Set up the page table
     if (setupIdentityMap()!=0){
 	    fail("[ERROR] MMU INIT FAILED");
@@ -86,6 +101,7 @@ void kernel_main() {
     hexdump(readBuffer, 512);
 
     while (1) {
+        esp_printf(putc, "running OS\n");
         wait_msec(1000);
         // readLine(buffer); // Uncomment if used.
     }
