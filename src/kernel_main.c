@@ -80,7 +80,7 @@ void kernel_main() {
         return;
     }
     success("FAT SYSTEM INITIALIZED\n");
-
+    /*    
     // Test SD card write and read
     success("starting");
     memcpy(writeBuffer, "Test data for SD card write", strlen("Test data for SD card write"));
@@ -96,11 +96,13 @@ void kernel_main() {
         return;
     }
     success("SD CARD READ SUCCESSFUL\n");
-
-    hexdump(readBuffer, 512);
+    */
 
     while (1) {
-        esp_printf(putc, "running OS\n");
+        esp_printf(putc, "PEENOS 8==> ");
+	char c;
+	c =getc();
+	esp_printf(putc, "%c\n", c);
         wait_msec(1000);
         // readLine(buffer); // Uncomment if used.
     }

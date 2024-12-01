@@ -11,18 +11,31 @@ static int len;
 static int num1;
 static int num2;
 static char pad_character;
-
+#define UART_LSR_RXFE (1 << 0)
 volatile int *muio_ptr = (volatile int *)(AUX_MU_IO);
 
 void putc(int data){
    if (muio_ptr != NULL) *muio_ptr = data;
 }
 
+/*
 char getc(){
 	while (!(*AUX_MU_LSR&0x01)) asm volatile("nop");
 	char c = (char)(*AUX_MU_IO);
 	if (c=='\r') return '\n'; 
    return c;
+}
+*/
+char getc(){
+	warning("getc() called. Wating for input\n");
+	while (*(AUX_MU_LSR) & UART_LSR_RXFE) {
+		esp_printf(putc, "Waiting... Receive FIFO is empty (RXFE set).\n");
+		wait_msec(500);
+	}
+	esp_printf(putc, "data available");
+	char recv_char = (char)(*(AUX_MU_IO) & 0xFF);
+	esp_printf(putc, "Received character: %c (0x%02X)\n", recv_char, recv_char);
+	return recv_char;
 }
 
 void logc(int data){
