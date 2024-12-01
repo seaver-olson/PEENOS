@@ -63,7 +63,6 @@ void kernel_main() {
     success("TIMER SETUP");
     asm("msr DAIFClr, #2");
     success("IRQ SETUP");
-    test_timer();
     init_pfa_list();
     struct ppage *allocd_list = allocate_physical_pages(10);
     free_physical_pages(allocd_list);

@@ -79,9 +79,7 @@ int loadPageTable(struct table_descriptor_stage1 *L1table) {
 int setupIdentityMap() {
     void *vaddr = (void *)0x0;
     void *paddr = (void *)0x0;
-
     // Map first 1GB with identity mapping
-    success("Setting up Memory Map\n");
     for (int i = 0; i < 512; i++) {
         mapPages(vaddr, paddr);
         vaddr += 0x200000;  // Increment by 2MB

@@ -15,7 +15,7 @@ SDIR = src
 OBJS = \
         exc.o\
         systimer.o \
-	boot.o \
+        boot.o \
 	delays.o \
 	kernel_main.o \
 	mmu.o \
