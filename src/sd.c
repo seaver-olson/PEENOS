@@ -93,16 +93,15 @@ int sd_cmd(unsigned int code, unsigned int arg)
     return 0;
 }
 
-/**
- * read a block from sd card and return the number of bytes read
- * returns 0 on error.
- */
 int sd_readblock(unsigned int lba, unsigned char *buffer, unsigned int num)
 {
     int r,c=0,d;
     if(num<1) num=1;
-    esp_printf(putc,"sd_readblock lba : %x", lba); 
-    esp_printf(putc," num: %x\n", num);
+    esp_printf(putc, "sd_readblock lba: ");
+    esp_printhex(lba);
+    esp_printf(putc, " num ");
+    esp_printhex(num);
+    esp_printf(putc,"\n");
     if(sd_status(SR_DAT_INHIBIT)) {sd_err=SD_TIMEOUT; return 0;}
     unsigned int *buf=(unsigned int *)buffer;
     if(sd_scr[0] & SCR_SUPP_CCS) {
@@ -122,16 +121,48 @@ int sd_readblock(unsigned int lba, unsigned char *buffer, unsigned int num)
             if(sd_err) return 0;
         }
         if((r=sd_int(INT_READ_RDY))){
-           fail("Timeout waiting for ready to read\n");
-        sd_err=r;return 0;}
-        for(d=0;d<128;d++){
- 		buf[d] = *EMMC_DATA;
+            fail("\rERROR: Timeout waiting for ready to read\n");
+            sd_err=r;
+            return 0;
         }
-	c++; buf+=128;
+        for(d=0;d<128;d++) buf[d] = *EMMC_DATA;
+        c++; buf+=128;
     }
     if( num > 1 && !(sd_scr[0] & SCR_SUPP_SET_BLKCNT) && (sd_scr[0] & SCR_SUPP_CCS)) sd_cmd(CMD_STOP_TRANS,0);
     return sd_err!=SD_OK || c!=num? 0 : num*512;
 }
+int sd_writeblock(unsigned char *buffer, unsigned int lba, unsigned int num)
+{
+    int r,c=0,d;
+    if(num<1) num=1;
+    esp_printf(putc, "sd_writeblock lba ");esp_printhex (lba);esp_printf(putc, " num ");esp_printhex (num);esp_printf(putc, "\n");
+    if(sd_status(SR_DAT_INHIBIT | SR_WRITE_AVAILABLE)) {sd_err=SD_TIMEOUT; return 0;}
+    unsigned int *buf=(unsigned int *)buffer;
+    if(sd_scr[0] & SCR_SUPP_CCS) {
+        if(num > 1 && (sd_scr[0] & SCR_SUPP_SET_BLKCNT)) {
+            sd_cmd(CMD_SET_BLOCKCNT,num);
+            if(sd_err) return 0;
+        }
+        *EMMC_BLKSIZECNT = (num << 16) | 512;
+        sd_cmd(num == 1 ? CMD_WRITE_SINGLE : CMD_WRITE_MULTI,lba);
+        if(sd_err) return 0;
+    } else {
+        *EMMC_BLKSIZECNT = (1 << 16) | 512;
+    }
+    while( c < num ) {
+        if(!(sd_scr[0] & SCR_SUPP_CCS)) {
+            sd_cmd(CMD_WRITE_SINGLE,(lba+c)*512);
+            if(sd_err) return 0;
+        }
+        if((r=sd_int(INT_WRITE_RDY))){esp_printf(putc, "\rERROR: Timeout waiting for ready to write\n");sd_err=r;return 0;}
+        for(d=0;d<128;d++) *EMMC_DATA = buf[d];
+        c++; buf+=128;
+    }
+    if((r=sd_int(INT_DATA_DONE))){esp_printf(putc, "\rERROR: Timeout waiting for data done\n");sd_err=r;return 0;}
+    if( num > 1 && !(sd_scr[0] & SCR_SUPP_SET_BLKCNT) && (sd_scr[0] & SCR_SUPP_CCS)) sd_cmd(CMD_STOP_TRANS,0);
+    return sd_err!=SD_OK || c!=num? 0 : num*512;
+}
+
 
 /**
  * set SD clock to frequency in Hz
@@ -158,8 +189,10 @@ int sd_clk(unsigned int f)
     }
     if(sd_hv>HOST_SPEC_V2) d=c; else d=(1<<s);
     if(d<=2) {d=2;s=0;}
-    esp_printf(putc,"sd_clk divisor : %x", d);
-    esp_printf(putc, " shift : %x\n", s);
+    esp_printf(putc,"sd_clk divisor : ");
+    esp_printhex(d);
+    esp_printf(putc, " shift : ");
+    esp_printhex(s);
     if(sd_hv>HOST_SPEC_V2) h=(d&0x300)>>2;
     d=(((d&0x0ff)<<8)|h);
     *EMMC_CONTROL1=(*EMMC_CONTROL1&0xffff003f)|d; wait_msec(10);
@@ -222,7 +255,7 @@ int sd_init()
     sd_cmd(CMD_SEND_IF_COND,0x000001AA);
     if(sd_err) return sd_err;
     cnt=6; r=0; while(!(r&ACMD41_CMD_COMPLETE) && cnt--) {
-        wait_msec(400);
+        wait_cycles(400);
         r=sd_cmd(CMD_SEND_OP_COND,ACMD41_ARG_HC);
         esp_printf(putc,"EMMC: CMD_SEND_OP_COND returned ");
         if(r&ACMD41_CMD_COMPLETE)
@@ -231,8 +264,8 @@ int sd_init()
             esp_printf(putc,"VOLTAGE ");
         if(r&ACMD41_CMD_CCS)
             esp_printf(putc,"CCS ");
-        //uart_hex(r>>32);
-        //uart_hex(r);
+        esp_printhex (r>>32);
+        esp_printhex (r);
         esp_printf(putc,"\n");
         if(sd_err!=SD_TIMEOUT && sd_err!=SD_OK ) {
             fail("ERROR: EMMC ACMD41 returned error\n");
@@ -247,8 +280,8 @@ int sd_init()
 
     sd_rca = sd_cmd(CMD_SEND_REL_ADDR,0);
     esp_printf(putc,"EMMC: CMD_SEND_REL_ADDR returned ");
-    //uart_hex(sd_rca>>32);
-    //uart_hex(sd_rca);
+    esp_printhex (sd_rca>>32);
+    esp_printhex (sd_rca);
     esp_printf(putc,"\n");
     if(sd_err) return sd_err;
 
@@ -285,52 +318,4 @@ int sd_init()
     sd_scr[0]&=~SCR_SUPP_CCS;
     sd_scr[0]|=ccs;
     return SD_OK;
-}
-
-int sd_writeblock(unsigned char *buff, unsigned int lba, unsigned int num){
-	int r;
-	int c=0;
-	int d=0;
-	if (num<1)num=1;
-	esp_printf(putc, "sd_writeblock lba ");
-	esp_printhex(lba);
-	esp_printf(putc, " num ");
-	esp_printhex(num);
-	esp_printf(putc, "\n");
-	if (sd_status(SR_DAT_INHIBIT | SR_WRITE_AVAILABLE)) {
-		sd_err=SD_TIMEOUT;
-		return 0;
-	}
-	if (sd_scr[0] & SCR_SUPP_CCS){
-		if (num > 1 && (sd_scr[0] & SCR_SUPP_SET_BLKCNT)){
-			sd_cmd(CMD_SET_BLOCKCNT, num);
-			if (sd_err) return 0;
-		}
-		*EMMC_BLKSIZECNT = (num << 16) | 512;
-		sd_cmd(num == 1 ? CMD_WRITE_SINGLE : CMD_WRITE_MULTI, lba);
-		if(sd_err) return 0;
-	} else *EMMC_BLKSIZECNT = (1 << 16) | 512;
-	while (num>c){
-		if (!(sd_scr[0] & SCR_SUPP_CCS)){
-			sd_cmd(CMD_WRITE_SINGLE,(lba+c)*512);
-			if(sd_err) return 0;
-		}
-		if((r=sd_int(INT_WRITE_RDY))){
-			fail("\rERROR: Timeout wating for ready to write\n");
-			sd_err=r;
-			return 0;
-		}
-		for (d=0;d<128;d++){ 
-			*EMMC_DATA = ((unsigned int *)buff)[d];
-		}
-		c++;
-		buff+=512;
-	}
-	if((r=sd_int(INT_DATA_DONE))){
-		fail("\rERROR: Timeout waiting for data done\n");
-		sd_err=r;
-		return 0;
-	}
-	if (num > 1 && !(sd_scr[0] & SCR_SUPP_SET_BLKCNT) && (sd_scr[0] & SCR_SUPP_CCS)) sd_cmd(CMD_STOP_TRANS,0);
-	return sd_err!=SD_OK || c!=num? 0 : num*512;
 }

@@ -339,7 +339,22 @@ try_next:
    }
 
 void esp_printhex(unsigned int num){
-   outnum(num, 16);
+   //print hexdump to putc
+   char hex[8];
+   int i;
+   for (i = 0; i < 8; i++){
+      hex[i] = (num >> (28 - 4*i)) & 0xF;
+      if (hex[i] < 10){
+         hex[i] += '0';
+      } else {
+         hex[i] += 'A' - 10;
+      }
+   }
+   esp_printf(putc, "0x");
+   for (i = 0; i < 8; i++){
+      esp_printf(putc, "%c", hex[i]);
+   }
+   esp_printf(putc, "\n");
 }
 /*---------------------------------------------------*/
 void red(){

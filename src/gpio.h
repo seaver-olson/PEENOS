@@ -127,7 +127,6 @@
 #define ACMD41_CMD_COMPLETE 0x80000000
 #define ACMD41_CMD_CCS      0x40000000
 #define ACMD41_ARG_HC       0x51ff8000
-
 // interrupt registers
 
 #define IRQ_BASIC       ((volatile unsigned int*)(MMIO_BASE+0x0000B200))
