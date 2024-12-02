@@ -1,16 +1,32 @@
 #include "delays.h"
-#define TIMER_COUNT_REG (TIMER_BASE + 0x04)
 
-volatile unsigned long get_timer_count() {
-    volatile unsigned long *timer_count_register = (volatile unsigned long *)TIMER_COUNT_REG;
-    return *timer_count_register;
+
+void wait_cycles(unsigned int cycles){
+	if (cycles){
+		while (cycles--){
+			asm volatile("nop");//nothing i guess(???)
+		}
+	}
 }
 
-void wait_msec(unsigned int ms){
-	unsigned long start = get_timer_count();
-	unsigned long wait_ticks = ms * 1000;
+volatile unsigned long get_timer_count() {
+    unsigned int h=-1,l;//high and low registers
+	h=*TIMER_HIGH;
+	l=*TIMER_LOW;
+	if (h!=*TIMER_HIGH){
+		h=*TIMER_HIGH;
+		l=*TIMER_LOW;
+	}
+	return ((unsigned long)h<<32)|l;
+}
 
-	while ((get_timer_count() - start) & (0xFFFFFFFF < wait_ticks)){
-	//do nothing please
-        }
+
+
+void wait_msec(unsigned int ms){
+	unsigned long t= get_timer_count();
+	if (t){
+		while (get_timer_count() -t<ms){
+			asm volatile("nop");
+		}
+	}
 }

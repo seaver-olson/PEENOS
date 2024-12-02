@@ -1,5 +1,8 @@
-#define MMIO_BASE       0x3F000000 
+
+
+#define MMIO_BASE       0x3F000000
 #define GPIO_BASE       (MMIO_BASE + 0x200000)
+#define TIMER_BASE      ((volatile unsigned int*)(MMIO_BASE+0x3000))
 
 #define GPFSEL0         ((volatile unsigned int*)(MMIO_BASE+0x00200000))
 #define GPFSEL1         ((volatile unsigned int*)(MMIO_BASE+0x00200004))
@@ -16,9 +19,9 @@
 #define GPEDS1          ((volatile unsigned int*)(MMIO_BASE+0x00200044))
 #define GPHEN0          ((volatile unsigned int*)(MMIO_BASE+0x00200064))
 #define GPHEN1          ((volatile unsigned int*)(MMIO_BASE+0x00200068))
-#define GPPUD           ((volatile unsigned int*)(GPIO_BASE+0x94))
-#define GPPUDCLK0       ((volatile unsigned int*)(GPIO_BASE+0x98))
-#define GPPUDCLK1       ((volatile unsigned int*)(GPIO_BASE+0x9C))
+#define GPPUD           ((volatile unsigned int*)(MMIO_BASE+0x00200094))
+#define GPPUDCLK0       ((volatile unsigned int*)(MMIO_BASE+0x00200098))
+#define GPPUDCLK1       ((volatile unsigned int*)(MMIO_BASE+0x0020009C))
 
 #define AUX_OFFSET 	0x00215000
 #define AUX_ENABLE      ((volatile unsigned int*)(MMIO_BASE+AUX_OFFSET+4))//test
@@ -140,8 +143,9 @@
 
 #define PERIPHERAL_LENGTH 0x01000000
 
-#define TIMER_BASE      ((volatile unsigned int*)(MMIO_BASE+0x3000))
+
 #define TIMER_LOW       ((volatile unsigned int*)(TIMER_BASE+0x04))
+#define TIMER_HIGH      ((volatile unsigned int*)(TIMER_BASE+0x08))
 
 #define LOCAL_BASE      0x4C0000000
 #define LOCAL_TIMER_IRQ     (volatile uint32_t*) (LOCAL_BASE+0x38)
