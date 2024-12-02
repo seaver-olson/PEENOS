@@ -100,10 +100,13 @@ void kernel_main() {
 
     while (1) {
         esp_printf(putc, "PEENOS 8==> ");
-	char c;
-	c =getc();
-	esp_printf(putc, "%c\n", c);
-        wait_msec(1000);
+	char c = getc_NB();
+	if (c != 0){
+		esp_printf(putc, "%c\n", c);
+        } else {
+		esp_printf(putc, "gun to my head");
+	}
         // readLine(buffer); // Uncomment if used.
     }
+    esp_printf(putc,"terminating");
 }

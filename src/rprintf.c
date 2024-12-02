@@ -37,6 +37,14 @@ char getc(){
 	esp_printf(putc, "Received character: %c (0x%02X)\n", recv_char, recv_char);
 	return recv_char;
 }
+char getc_NB(){
+    if (*AUX_MU_LSR & 0x01){
+        char received_char = (char)(*AUX_MU_IO & 0xFF);  // Read the received byte
+        esp_printf(putc, "Received character: 0x%02X\n", received_char);  // Debug output
+        return received_char;
+    }
+    return 0;
+}
 
 void logc(int data){
    //send data to log.txt

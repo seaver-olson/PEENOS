@@ -25,6 +25,7 @@ typedef unsigned int  size_t;
 
 void putc(int data);
 char getc();
+char getc_NB();
 int strcmp(char *first, char *second);
 void *memcpy(void *dest, const void *src, size_t n);
 int strncmp(char *first, char *second, size_t n);
