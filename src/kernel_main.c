@@ -63,11 +63,12 @@ void kernel_main() {
     success("TIMER SETUP");
     asm("msr DAIFClr, #2");
     success("IRQ SETUP");
+    
     init_pfa_list();
     struct ppage *allocd_list = allocate_physical_pages(10);
     free_physical_pages(allocd_list);
     success("Page list set up");
-    // Set up the page table
+    /* Set up the page table
     if (setupIdentityMap()!=0){
 	    fail("[ERROR] MMU INIT FAILED");
 	    return;
@@ -75,12 +76,13 @@ void kernel_main() {
     success("MMU INITIALIZED\n");
 
     // Initialize FAT filesystem
+
     if (fatInit() != 0) {
         fail("[ERROR] FAT INIT FAILED");
         return;
     }
     success("FAT SYSTEM INITIALIZED\n");
-    /*    
+    
     // Test SD card write and read
     success("starting");
     memcpy(writeBuffer, "Test data for SD card write", strlen("Test data for SD card write"));
@@ -106,6 +108,7 @@ void kernel_main() {
         } else {
 		esp_printf(putc, "gun to my head");
 	}
+        wait_msec(1000000);
         // readLine(buffer); // Uncomment if used.
     }
     esp_printf(putc,"terminating");
