@@ -3,7 +3,6 @@
 
 //#include <ctype.h>
 //#include <string.h>
-#include <stdint.h>
 #include <stdarg.h>
 #include "gpio.h"
 #include "delays.h"

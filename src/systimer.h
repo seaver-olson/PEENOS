@@ -11,4 +11,7 @@
 
 void timer_setup(int ms_interval);
 
+void writeVirtualCounterTval(uint32_t val);    // Writes to the virtual timer's target value register
+uint32_t readCounterFrequency(void);            // Reads the frequency of the timer
+void enableVirtualCounter(void); 
 #endif

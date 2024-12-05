@@ -79,6 +79,7 @@ int loadPageTable(struct table_descriptor_stage1 *L1table) {
 int setupIdentityMap() {
     void *vaddr = (void *)0x0;
     void *paddr = (void *)0x0;
+    esp_printf(putc, "Setting up identity map\n");
     // Map first 1GB with identity mapping
     for (int i = 0; i < 512; i++) {
         mapPages(vaddr, paddr);

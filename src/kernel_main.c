@@ -8,23 +8,10 @@
 extern unsigned char __bss_end;
 extern unsigned char __bss_start;
 
-void test_timer() {
-    esp_printf(putc, "Starting timer test...\n");
-    unsigned long timer_value;
-
-    // Continuously print the timer value every 500 milliseconds
-    for (int i = 0; i < 10; i++) { // Print 10 readings
-        timer_value = get_timer_count();
-        esp_printf(putc, "Timer value: %lu\n", timer_value);
-        wait_msec(500); // Wait 500 ms between readings
-    }
-
-    esp_printf(putc, "Timer test complete.\n");
-}
-
 void clear_bss() {
     unsigned char *begin_bss = &__bss_start;
     unsigned char *end_bss = &__bss_end;
+    esp_printf("Attempting to clear bss...\n");
     while (begin_bss < end_bss) {
         *begin_bss = 0;
         begin_bss++;
@@ -56,6 +43,7 @@ unsigned int getEL() {
 }
 
 void kernel_main() {
+    clear_bss();
     unsigned char writeBuffer[512];
     unsigned char readBuffer[512];
     // Initialize timer and enable IRQ
@@ -63,19 +51,18 @@ void kernel_main() {
     success("TIMER SETUP");
     asm("msr DAIFClr, #2");
     success("IRQ SETUP");
-    
+    esp_printf(putc,"Freq: %u\n",read_timer_freq());
     init_pfa_list();
     struct ppage *allocd_list = allocate_physical_pages(10);
     free_physical_pages(allocd_list);
     success("Page list set up");
-    /* Set up the page table
     if (setupIdentityMap()!=0){
 	    fail("[ERROR] MMU INIT FAILED");
 	    return;
     }
     success("MMU INITIALIZED\n");
 
-    // Initialize FAT filesystem
+    /* Initialize FAT filesystem
 
     if (fatInit() != 0) {
         fail("[ERROR] FAT INIT FAILED");
@@ -101,14 +88,8 @@ void kernel_main() {
     */
 
     while (1) {
-        esp_printf(putc, "PEENOS 8==> ");
-	char c = getc_NB();
-	if (c != 0){
-		esp_printf(putc, "%c\n", c);
-        } else {
-		esp_printf(putc, "gun to my head");
-	}
-        wait_msec(1000000);
+        //esp_printf(putc, "PEENOS 8==> ");
+	//esp_printf(putc, "%c\n", getc());
         // readLine(buffer); // Uncomment if used.
     }
     esp_printf(putc,"terminating");

@@ -2,7 +2,7 @@
 
 CC := aarch64-linux-gnu-gcc
 LD := aarch64-linux-gnu-ld
-OBJDUMP := aarch64-linux-gnu--objdump
+OBJDUMP := aarch64-linux-gnu-objdump
 OBJCOPY := aarch64-linux-gnu-objcopy
 CONFIGS := -DCONFIG_HEAP_SIZE=4096
 
@@ -53,7 +53,7 @@ debug:
 	TERM=xterm gdb -x gdb_init_prot_mode.txt && killall qemu-system-aarch64
 
 run:
-	qemu-system-aarch64 -machine raspi3b -kernel kernel8.img -hda rootfs.img -serial null -serial stdio -monitor none -nographic -k en-us
+	qemu-system-aarch64 -machine raspi3b -kernel kernel8.img -hda rootfs.img -serial null -serial stdio -monitor none --nographic
 
 disassemble:
 	$(OBJDUMP) -D kernel8.elf

@@ -28,7 +28,7 @@ char getc(){
 */
 char getc(){
 	warning("getc() called. Wating for input\n");
-	while (*(AUX_MU_LSR) & UART_LSR_RXFE) {
+	while (!(*(AUX_MU_LSR) & UART_LSR_RXFE)) {
 		esp_printf(putc, "Waiting... Receive FIFO is empty (RXFE set).\n");
 		wait_msec(500);
 	}
@@ -217,126 +217,109 @@ static int getnum( charptr* linep)
 void esp_printf( const func_ptr f_ptr, charptr ctrl, ...)
 {
   va_list args;
-  va_start(args, *ctrl);
+  va_start(args, ctrl);
   esp_vprintf(f_ptr, ctrl, args);
   va_end( args );
   
 }
+void esp_vprintf(const func_ptr f_ptr, charptr ctrl, va_list argp) {
+    int long_flag, dot_flag, left_flag, do_padding;
+    char ch;
+    char pad_character = ' ';
+    int num1 = 0, num2 = 32767; // Default values, can be customized
+    out_char = f_ptr; // Set output function
 
-void esp_vprintf( const func_ptr f_ptr, charptr ctrl, va_list argp)
-{
+    for (; *ctrl; ctrl++) {
+        if (*ctrl != '%') {
+            out_char(*ctrl); // Print regular character
+            continue;
+        }
 
-   int long_flag;
-   int dot_flag;
+        // Initialize flags
+        long_flag = dot_flag = left_flag = do_padding = 0;
+        pad_character = ' ';
 
-   char ch;
-   //va_list argp;
+        // Move to next character (after '%')
+        ch = *(++ctrl);
 
-   //va_start( argp, ctrl);
-   out_char = f_ptr;
+        // Handle numeric specifiers (width)
+        if (isdig((int)ch)) {
+            if (dot_flag) {
+                num2 = getnum(&ctrl);
+            } else {
+                if (ch == '0') pad_character = '0';
+                num1 = getnum(&ctrl);
+                do_padding = 1;
+            }
+            ctrl--; // Correctly adjust for the loop increment
+            continue;
+        }
 
-   for ( ; *ctrl; ctrl++) {
+        // Handle format specifiers
+        switch (tolower((int)ch)) {
+            case '%':
+                out_char('%');
+                break;
 
-      /* move format string chars to buffer until a  */
-      /* format control is found.                    */
-      if (*ctrl != '%') {
-         out_char(*ctrl);
-         continue;
-         }
+            case '-':
+                left_flag = 1;
+                break;
 
-      /* initialize all the flags for this format.   */
-      dot_flag   =
-      long_flag  =
-      left_flag  =
-      do_padding = 0;
-      pad_character = ' ';
-      num2=32767;
+            case '.':
+                dot_flag = 1;
+                break;
 
-try_next:
-      ch = *(++ctrl);
+            case 'l':
+                long_flag = 1;
+                break;
 
-      if (isdig((int)ch)) {
-         if (dot_flag)
-            num2 = getnum(&ctrl);
-         else {
-            if (ch == '0')
-               pad_character = '0';
+            case 'i': // Signed integer
+            case 'd': 
+                if (long_flag || ch == 'D') {
+                    outnum(va_arg(argp, long), 10L); // Print long
+                } else {
+                    outnum(va_arg(argp, int), 10L); // Print int
+                }
+                break;
 
-            num1 = getnum(&ctrl);
-            do_padding = 1;
-         }
-         ctrl--;
-         goto try_next;
-      }
+            case 'u': // Unsigned integer
+                if (long_flag) {
+                    outnum(va_arg(argp, unsigned long), 10L); // Print unsigned long
+                } else {
+                    outnum(va_arg(argp, unsigned int), 10L); // Print unsigned int
+                }
+                break;
 
-      switch (tolower((int)ch)) {
-         case '%':
-              out_char( '%');
-              continue;
+            case 'x': // Hexadecimal (unsigned)
+                outnum((long)va_arg(argp, unsigned int), 16L); // Print unsigned int as hex
+                break;
 
-         case '-':
-              left_flag = 1;
-              break;
+            case 's':
+                outs(va_arg(argp, charptr)); // Print string
+                break;
 
-         case '.':
-              dot_flag = 1;
-              break;
+            case 'c':
+                out_char(va_arg(argp, int)); // Print character
+                break;
 
-         case 'l':
-              long_flag = 1;
-              break;
-	
-         case 'i':
-         case 'd':
-              if (long_flag || ch == 'D') {
-                 outnum( va_arg(argp, long), 10L);
-                 continue;
-                 }
-              else {
-                 outnum( va_arg(argp, int), 10L);
-                 continue;
-                 }
-         case 'x':
-              outnum( (long)va_arg(argp, int), 16L);
-              continue;
+            case '\\':
+                switch (*ctrl) {
+                    case 'a': out_char(0x07); break;
+                    case 'h': out_char(0x08); break;
+                    case 'r': out_char(0x0D); break;
+                    case 'n': out_char(0x0D); out_char(0x0A); break;
+                    default: out_char(*ctrl); break;
+                }
+                ctrl++;
+                break;
 
-         case 's':
-              outs( va_arg( argp, charptr));
-              continue;
+            default:
+                esp_printf(f_ptr, "Error: Unsupported format specifier %c\n", ch);
+                break;
+        }
+    }
+}
 
-         case 'c':
-              out_char( va_arg( argp, int));
-              continue;
-
-         case '\\':
-              switch (*ctrl) {
-                 case 'a':
-                      out_char( 0x07);
-                      break;
-                 case 'h':
-                      out_char( 0x08);
-                      break;
-                 case 'r':
-                      out_char( 0x0D);
-                      break;
-                 case 'n':
-                      out_char( 0x0D);
-                      out_char( 0x0A);
-                      break;
-                 default:
-                      out_char( *ctrl);
-                      break;
-                 }
-              ctrl++;
-              break;
-
-         default:
-              continue;
-         }
-      goto try_next;
-      }
-   va_end( argp);
-   }
 
 void esp_printhex(unsigned int num){
    //print hexdump to putc

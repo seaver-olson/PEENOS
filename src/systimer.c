@@ -11,17 +11,13 @@ uint32_t readCounterFrequency(void) {
 	asm volatile ("mrs %0, cntfrq_el0" : "=r" (val));
 	return val;
 }
-#if 0
-void init_timer(void) {
-	timer_cntfrq = timer_tick = read_cntfrq();
-	write_cntv_tval(timer_cntfrq);    // clear cntv interrupt and set next 1 sec timer.
-	return;
-}
-#endif
 
 void enableVirtualCounter(void) {
-	asm volatile ( "mov x1,#1\r\n"
-                 "msr cntv_ctl_el0, x1" ::: "x1" );
+	unsigned int val;
+	asm volatile ("msr cntv_ctl_el0, %0" :: "r"(1)); // Enable the timer
+
+    	asm volatile ("mrs %0, cntv_ctl_el0" : "=r" (val));
+	esp_printf(putc, "CNTV_CTL_EL0: %u\n", val);
 }
 
 static uint32_t s_tickInterval = 1000;
@@ -35,4 +31,5 @@ void timer_setup(int ms_interval) {
   writeVirtualCounterTval(s_tickInterval);
   enableVirtualCounter();
   *CORE0_TIMER_IRQCNTL = CNTVIRQ_CTL;
+
 }

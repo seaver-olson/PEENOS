@@ -1,8 +1,8 @@
-
+#include <stdint.h>
 
 #define MMIO_BASE       0x3F000000
 #define GPIO_BASE       (MMIO_BASE + 0x200000)
-#define TIMER_BASE      ((volatile unsigned int*)(MMIO_BASE+0x3000))
+#define TIMER_BASE      ((volatile unsigned int*)0x3F003000)
 
 #define GPFSEL0         ((volatile unsigned int*)(MMIO_BASE+0x00200000))
 #define GPFSEL1         ((volatile unsigned int*)(MMIO_BASE+0x00200004))
@@ -143,8 +143,8 @@
 #define PERIPHERAL_LENGTH 0x01000000
 
 
-#define TIMER_LOW       ((volatile unsigned int*)(TIMER_BASE+0x04))
-#define TIMER_HIGH      ((volatile unsigned int*)(TIMER_BASE+0x08))
 
+#define TIMER_LOW     ((volatile unsigned int*)(TIMER_BASE + 0x04))
+#define TIMER_HIGH    ((volatile unsigned int*)(TIMER_BASE + 0x08))
 #define LOCAL_BASE      0x4C0000000
 #define LOCAL_TIMER_IRQ     (volatile uint32_t*) (LOCAL_BASE+0x38)
