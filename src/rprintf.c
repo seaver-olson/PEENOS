@@ -151,36 +151,30 @@ static void outs( charptr lp)
 /*                                                   */
 static void outnum(unsigned int num, const int base)
 {
-   charptr cp;
-   int negative;
-   char outbuf[32];
-   const char digits[] = "0123456789ABCDEF";
+    char outbuf[32];
+    const char digits[] = "0123456789ABCDEF";
+    int negative = 0;
+    char *cp = outbuf;
 
-   /* Check if number is negative                    */
-   /* NAK 2009-07-29 Negate the number only if it is not a hex value. */
-   if (num < 0L && base != 16L) {
-      negative = 1;
-      num = -num;
-      }
-   else
-      negative = 0;
+    if (num < 0L && base != 16L) {
+        negative = 1;
+        num = -num;
+    }
 
-   /* Build number (backwards) in outbuf             */
-   cp = outbuf;
-   do {
-      *cp++ = digits[num % base];
-      } while ((num /= base) > 0);
-   if (negative)
-      *cp++ = '-';
-   *cp-- = 0;
+    // Build number (backwards) in outbuf
+    do {
+        *cp++ = digits[num % base];
+    } while ((num /= base) > 0);
 
-   /* Move the converted number to the buffer and    */
-   /* add in the padding where needed.               */
-   len = strlen(outbuf);
-   padding( !left_flag);
-   while (cp >= outbuf)
-      out_char( *cp--);
-   padding( left_flag);
+    if (negative) *cp++ = '-';
+    *cp = '\0'; 
+
+    len = strlen(outbuf);
+    padding(!left_flag);
+    while (--cp >= outbuf) {
+        out_char(*cp);
+    }
+    padding(left_flag);
 }
 
 /*---------------------------------------------------*/
@@ -322,22 +316,7 @@ void esp_vprintf(const func_ptr f_ptr, charptr ctrl, va_list argp) {
 
 
 void esp_printhex(unsigned int num){
-   //print hexdump to putc
-   char hex[8];
-   int i;
-   for (i = 0; i < 8; i++){
-      hex[i] = (num >> (28 - 4*i)) & 0xF;
-      if (hex[i] < 10){
-         hex[i] += '0';
-      } else {
-         hex[i] += 'A' - 10;
-      }
-   }
-   esp_printf(putc, "0x");
-   for (i = 0; i < 8; i++){
-      esp_printf(putc, "%c", hex[i]);
-   }
-   esp_printf(putc, "\n");
+   esp_printf(putc, "0x%08X\n", num);
 }
 /*---------------------------------------------------*/
 void red(){
