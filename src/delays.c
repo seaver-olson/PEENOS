@@ -28,14 +28,12 @@ volatile unsigned long get_timer_count() {
     return ((unsigned long)h << 32) | l;
 }
 void wait_msec(unsigned int ms) {
-    unsigned long start_time = get_timer_count();
-    unsigned long target_time = start_time + ms;
-    esp_printf(putc, "start: %u", start_time);
-    esp_printf(putc, "end: %u", target_time);
-    while(start_time < target_time){
-	//esp_printf(putc, "%u : %u",start_time, target_time);
-	start_time=get_timer_count();
-   	esp_printf(putc, "start now: %u", start_time); 
+   unsigned long start_time = get_timer_count();
+   unsigned long target_time = start_time + ms;
+   esp_printf(putc, "start: %lu", start_time);
+   esp_printf(putc, "end: %lu", target_time);
+   while ((unsigned long)(get_timer_count() - start_time) < ms){
+	esp_printf(putc, "Current: %lu / Target: %lu\n", get_timer_count(), target_time);
    }
    esp_printf(putc, "%u : %u",start_time, target_time);
 

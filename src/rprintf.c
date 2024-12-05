@@ -225,8 +225,8 @@ void esp_printf( const func_ptr f_ptr, charptr ctrl, ...)
 void esp_vprintf(const func_ptr f_ptr, charptr ctrl, va_list argp) {
     int long_flag, dot_flag, left_flag, do_padding;
     char ch;
-    char pad_character = ' ';
-    int num1 = 0, num2 = 32767; // Default values, can be customized
+    //char pad_character = ' ';
+    //int num1 = 0, num2 = 32767; // Default values, can be customized
     out_char = f_ptr; // Set output function
 
     for (; *ctrl; ctrl++) {

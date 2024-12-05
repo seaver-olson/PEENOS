@@ -12,12 +12,21 @@ uint32_t readCounterFrequency(void) {
 	return val;
 }
 
-void enableVirtualCounter(void) {
-	unsigned int val;
-	asm volatile ("msr cntv_ctl_el0, %0" :: "r"(1)); // Enable the timer
 
-    	asm volatile ("mrs %0, cntv_ctl_el0" : "=r" (val));
-	esp_printf(putc, "CNTV_CTL_EL0: %u\n", val);
+void enableVirtualCounter(void) {
+    unsigned int val;
+
+    asm volatile ("msr cntv_ctl_el0, %0" :: "r"(1));  // Enable = 1, IMASK = 0
+    asm volatile ("mrs %0, cntv_ctl_el0" : "=r"(val));
+
+    esp_printf(putc, "CNTV_CTL_EL0: 0x%u\n", val);
+
+    // Check if ENABLE bit is set correctly (optional)
+    if (val & 0x1) {
+        esp_printf(putc,"Virtual counter enabled.");
+    } else {
+        esp_printf(putc,"Failed to enable virtual counter.");
+    }
 }
 
 static uint32_t s_tickInterval = 1000;

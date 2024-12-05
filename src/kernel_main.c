@@ -11,12 +11,13 @@ extern unsigned char __bss_start;
 void clear_bss() {
     unsigned char *begin_bss = &__bss_start;
     unsigned char *end_bss = &__bss_end;
-    esp_printf("Attempting to clear bss...\n");
-    while (begin_bss < end_bss) {
-        *begin_bss = 0;
-        begin_bss++;
+    if (begin_bss >= end_bss) {
+        esp_printf(putc, "Invalid BSS range, aborting clear.");
+        return;
     }
-    success("BSS CLEARED");
+    esp_printf(putc, "Attempting to clear BSS section from %u to %u...\n", begin_bss, end_bss);
+    while (begin_bss < end_bss) {*begin_bss++ = 0;}
+    esp_printf(putc, "finished clearing bss\n");	
 }
 
 void hexdump(unsigned char *buffer, unsigned int length) {
@@ -36,18 +37,15 @@ void hexdump(unsigned char *buffer, unsigned int length) {
 
 unsigned int getEL() {
     unsigned int el;
-    asm("mrs %0, CurrentEL"
-        : "=r"(el)
-        :
-        :);
-    return el;
+    asm volatile("mrs %0, CurrentEL" : "=r"(el));  // Read CurrentEL register
+    return (el >> 2) & 0x3;  // Extract EL from bits [3:2]
 }
 
 void kernel_main() {
     clear_bss();
     esp_printf(putc, "Current EL: %d\n", getEL());
-    unsigned char writeBuffer[512];
-    unsigned char readBuffer[512];
+    //unsigned char writeBuffer[512];
+    //unsigned char readBuffer[512];
     // Initialize timer and enable IRQ
     timer_setup(1);
     success("TIMER SETUP");
@@ -73,7 +71,6 @@ void kernel_main() {
     success("FAT SYSTEM INITIALIZED\n");
     
     // Test SD card write and read
-    success("starting");
     memcpy(writeBuffer, "Test data for SD card write", strlen("Test data for SD card write"));
     success("prepping for write...");
     if (sd_writeblock(writeBuffer, 0, 1) != 0) {
@@ -90,8 +87,9 @@ void kernel_main() {
     */
 
     while (1) {
-        //esp_printf(putc, "PEENOS 8==> ");
-	//esp_printf(putc, "%c\n", getc());
+        esp_printf(putc, "PEENOS 8==> ");
+	wait_msec(1000);
+        //esp_printf(putc, "%c\n", getc());
         // readLine(buffer); // Uncomment if used.
     }
     esp_printf(putc,"terminating");
