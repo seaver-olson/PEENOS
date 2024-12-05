@@ -16,6 +16,7 @@ void clear_bss() {
         *begin_bss = 0;
         begin_bss++;
     }
+    success("BSS CLEARED");
 }
 
 void hexdump(unsigned char *buffer, unsigned int length) {
@@ -44,6 +45,7 @@ unsigned int getEL() {
 
 void kernel_main() {
     clear_bss();
+    esp_printf(putc, "Current EL: %d\n", getEL());
     unsigned char writeBuffer[512];
     unsigned char readBuffer[512];
     // Initialize timer and enable IRQ
