@@ -42,6 +42,7 @@ unsigned int getEL() {
 }
 
 void kernel_main() {
+    logo();
     clear_bss();
     esp_printf(putc, "Current EL: %d\n", getEL());
     //unsigned char writeBuffer[512];

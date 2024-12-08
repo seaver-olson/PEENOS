@@ -379,3 +379,14 @@ void debug(char *str){
    esp_printf(logc, "%s\n", str);
 }
 
+void logo(){
+    blue();
+    esp_printf(putc, "\n\n");
+    esp_printf(putc, " ____  ____  ____  _  _  _____  ___ \n");
+    esp_printf(putc, "(  _ \\( ___)( ___)( \\( )(  _  )/ __)\n");
+    esp_printf(putc, " )___/ )__)  )__)  )  (  )(_)( \\__ \\\n");
+    esp_printf(putc, "(__)  (____)(____)(_\\_)(_____)(___/\n");
+    esp_printf(putc, "\n\n");
+    resetColor();
+}
+

@@ -59,7 +59,7 @@ void white();
 void success(char *str);
 void fail(char *str);
 void warning(char *str);
-
+void logo();
 
 
 
