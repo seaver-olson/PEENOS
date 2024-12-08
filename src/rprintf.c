@@ -27,15 +27,11 @@ char getc(){
 }
 */
 char getc(){
-	warning("getc() called. Wating for input\n");
-	while (!(*(AUX_MU_LSR) & UART_LSR_RXFE)) {
-		esp_printf(putc, "Waiting... Receive FIFO is empty (RXFE set).\n");
-		wait_msec(500);
+ 	while (!(*AUX_MU_LSR & 0x01)) {
+		asm volatile("nop");
 	}
-	esp_printf(putc, "data available");
-	char recv_char = (char)(*(AUX_MU_IO) & 0xFF);
-	esp_printf(putc, "Received character: %c (0x%02X)\n", recv_char, recv_char);
-	return recv_char;
+        esp_printf(putc, "data available");
+	return (char)(*AUX_MU_LSR & 0xFF);
 }
 char getc_NB(){
     if (*AUX_MU_LSR & 0x01){

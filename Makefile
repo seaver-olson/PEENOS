@@ -56,8 +56,8 @@ debug:
 	TERM=xterm gdb -x gdb_init_prot_mode.txt && killall qemu-system-aarch64
 
 run:
-	qemu-system-aarch64 -machine raspi3b -kernel kernel8.img -hda rootfs.img -serial null -serial stdio -monitor none --nographic
-
+	clear && qemu-system-aarch64 -machine raspi3b -kernel kernel8.img -drive file=rootfs.img,format=raw,if=sd -serial null -serial stdio -monitor none --nographic
+	
 disassemble:
 	$(OBJDUMP) -D kernel8.elf
 
