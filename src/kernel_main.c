@@ -10,6 +10,20 @@
 
 #define CMD_BUFFER_SIZE 512
 
+void readLine(char *buffer){
+    char c;
+    int i=0;
+    while(1){
+        c=getc();
+        if(c=='\n'){
+            buffer[i]='\0';
+            return;
+        }
+        buffer[i]=c;
+        i++;
+    }
+}
+
 void pShell(){
     char buffer[CMD_BUFFER_SIZE];
     while(1){
