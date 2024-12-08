@@ -20,6 +20,7 @@ OBJS = \
         boot.o \
 	delays.o \
 	kernel_main.o \
+	cmds.o \
 	mmu.o \
 	page.o \
 	rprintf.o \
