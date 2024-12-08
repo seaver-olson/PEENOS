@@ -50,6 +50,7 @@ void kernel_main() {
     // Initialize timer and enable IRQ
     timer_setup(1);
     success("TIMER SETUP");
+    interrupt_setup();
     asm("msr DAIFClr, #2");
     success("IRQ SETUP");
     esp_printf(putc,"Freq: %u\n",read_timer_freq());
