@@ -4,6 +4,7 @@
 #include "delays.h"
 #include "fat.h"
 #include "systimer.h"
+#include "interrupt.h"
 
 extern unsigned char __bss_end;
 extern unsigned char __bss_start;
@@ -90,7 +91,7 @@ void kernel_main() {
 
     while (1) {
         esp_printf(putc, "PEENOS 8==> ");
-	wait_msec(1000);
+	wait_cycles(10000);
         //esp_printf(putc, "%c\n", getc());
         // readLine(buffer); // Uncomment if used.
     }

@@ -15,17 +15,9 @@ uint32_t read_timer_freq() {
     return freq;
 }
 
-volatile unsigned long get_timer_count() {
-    unsigned int h, l;
-    h = *TIMER_HIGH;
-    l = *TIMER_LOW;
-    // Ensure that the high register hasn't changed between the reads.
-    if (h != *TIMER_HIGH) {
-        h = *TIMER_HIGH;
-        l = *TIMER_LOW;
-	warning("[Warning] high register changed between timer readings\n");
-    }
-    return ((unsigned long)h << 32) | l;
+unsigned long get_timer_count() {
+	unsigned long *timer_count_register = (unsigned long *)0x3f003004;
+  	return *timer_count_register;
 }
 void wait_msec(unsigned int ms) {
    unsigned long start_time = get_timer_count();

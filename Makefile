@@ -13,8 +13,10 @@ ODIR = obj
 SDIR = src
 
 OBJS = \
+	vector_table.o \
         exc.o\
         systimer.o \
+        interrupt.o \
         boot.o \
 	delays.o \
 	kernel_main.o \

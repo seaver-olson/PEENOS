@@ -11,7 +11,7 @@ void interrupt_setup(){
 }
 
 void handle_timer(){
-	esp_printf(putc, "Timer interrupt handled, next scheduled at: %u\n", read_timer_cnt());
+	esp_printf(putc, "Timer interrupt handled, next scheduled at: %u\n", read_timer_freq());
 }
 
 void handle_irq(){
