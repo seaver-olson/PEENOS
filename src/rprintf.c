@@ -31,7 +31,7 @@ char getc(){
 		asm volatile("nop");
 	}
         esp_printf(putc, "data available");
-	return (char)(*AUX_MU_LSR & 0xFF);
+	return (char)(*AUX_MU_IO & 0xFF);
 }
 char getc_NB(){
     if (*AUX_MU_LSR & 0x01){
