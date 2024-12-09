@@ -20,17 +20,22 @@ void executeCommand(char *command) {
     if (args != NULL) {
         *args = '\0';  // Terminate the command string at the first space
    	args++;
-     }
+    }
+    esp_printf(putc, "Command: %s\n", command);
+    esp_printf(putc, "Args: %s\n", args);
     if (strcmp(command, "help") == 0) {
         esp_printf(putc, "Available commands:\n");
         esp_printf(putc, "  help - Show this help message\n");
         esp_printf(putc, "  logo - Display the logo\n");
         esp_printf(putc, "  clear - Clear the screen\n");
         esp_printf(putc, "  meminfo - Display memory information\n");
-	esp_printf(putc, "  exit - use your best guess\n");
+	    esp_printf(putc, "  exit - use your best guess\n");
+        esp_printf(putc, "  getEL - Get the current exception level\n");
     } else if (strcmp(command, "exit") == 0){
-	running = 0;
-	esp_printf(putc, "Exiting the shell...\n");
+	    running = 0;
+	    esp_printf(putc, "Exiting the shell...\n");
+    } else if (strcmp(command, "getEL")==0){
+        esp_printf(putc, "Current EL: %d\n", getEL());
     } else if (strcmp(command, "clear") == 0) {
         clearScreen();
     } else if (strcmp(command, "logo") == 0) {
