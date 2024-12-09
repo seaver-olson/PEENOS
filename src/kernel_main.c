@@ -11,7 +11,6 @@
 #define CMD_BUFFER_SIZE 512
 
 void executeCommand(char *command) {
-    esp_printf(putc, "Executing command: %s\n", command);
     if (strcmp(command, "help") == 0) {
         esp_printf(putc, "Available commands:\n");
         esp_printf(putc, "  help - Show this help message\n");
@@ -80,10 +79,16 @@ void kernel_main() {
 		buf_index=0;//go back to start of line
 		esp_printf(putc, "\nPEENOS 8==> ");
         	
-	}
+	} else if (c == '\0') continue;
         else {
-                buffer[buf_index++] = c; // Add character to buffer
-               	putc(c); // Echo back
+		if (buf_index < CMD_BUFFER_SIZE - 1) {
+                	buffer[buf_index++] = c; // Add character to buffer
+               		putc(c); // Echo back
+		} else{
+			esp_printf(putc, "\nBuffer overflow! Resetting...\n");
+                	buf_index = 0; // Reset buffer
+                	esp_printf(putc, "PEENOS 8==> "); 
+		}
 	}
     }
     esp_printf(putc,"terminating");
