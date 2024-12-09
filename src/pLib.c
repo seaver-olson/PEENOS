@@ -7,6 +7,7 @@
 #include "interrupt.h"
 #include "cmds.h"
 #include "sd.h"
+#include "page.h"
 
 void clearScreen(){
     esp_printf(putc, "\033[2J\033[H");

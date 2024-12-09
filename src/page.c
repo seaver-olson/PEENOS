@@ -71,14 +71,17 @@ unsigned int get_total_pages() {
 
 unsigned int get_used_pages() {
     unsigned int free_page_count = 0;
-    struct ppage *current = free_page_list;  // Assume this is your free page list head
+    struct ppage *current = physical_frame_allocation;
+
     while (current != NULL) {
         free_page_count++;
         current = current->next;
     }
+
     return total_physical_pages - free_page_count;
 }
 
+// Return the number of free pages
 unsigned int get_free_pages() {
     unsigned int free_page_count = 0;
     struct ppage *current = physical_frame_allocation;
@@ -90,4 +93,5 @@ unsigned int get_free_pages() {
 
     return free_page_count;
 }
+
 

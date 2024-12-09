@@ -7,6 +7,7 @@
 #include "interrupt.h"
 #include "cmds.h"
 #include "sd.h"
+#include "pLib.h"
 
 #define CMD_BUFFER_SIZE 512
 
@@ -89,7 +90,14 @@ void kernel_main() {
 		esp_printf(putc, "\nPEENOS 8==> ");
         	
 	} else if (c == '\0') continue;
-        else {
+        else if (c == '\b' || c == 127){
+	    if (buf_index > 0) { // Ensure there's something to delete
+                buf_index--; // Move the index back
+                buffer[buf_index] = '\0'; // Clear the last character in the buffer
+                esp_printf(putc, "\b \b"); // Erase the character from the terminal
+            }
+	}
+	else {
 		if (buf_index < CMD_BUFFER_SIZE - 1) {
                 	buffer[buf_index++] = c; // Add character to buffer
                		putc(c); // Echo back

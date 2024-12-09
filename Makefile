@@ -18,6 +18,7 @@ OBJS = \
         systimer.o \
         interrupt.o \
         boot.o \
+	pLib.o \
 	delays.o \
 	kernel_main.o \
 	cmds.o \
