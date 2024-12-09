@@ -10,6 +10,18 @@
 
 #define CMD_BUFFER_SIZE 512
 
+void executeCommand(char *command) {
+    if (strcmp(command, "help") == 0) {
+        esp_printf(putc, "Available commands:\n");
+        esp_printf(putc, "  help - Show this help message\n");
+        esp_printf(putc, "  logo - Display the logo\n");
+    } else if (strcmp(command, "logo") == 0) {
+        logo();
+    } else {
+        esp_printf(putc, "Unknown command: %s\n", command);
+    }
+}
+
 void readLine(char *buffer){
     char c;
     int i=0;
@@ -21,6 +33,11 @@ void readLine(char *buffer){
         }
         buffer[i]=c;
         i++;
+	if (i >= CMD_BUFFER_SIZE - 1) { 
+		buffer[i] = '\0';
+        	esp_printf(putc, "Input too long. Truncated to: %s\n", buffer);
+                return;
+	}
     }
 }
 
@@ -29,11 +46,16 @@ void pShell(){
     while(1){
         esp_printf(putc, "PEENOS 8==> ");
         readLine(buffer);
-        esp_printf(putc, "You entered: %s\n", buffer);
+	if (strlen(buffer) == 0){
+		warning("Recieved empty command");
+	}
+	esp_printf(putc, "&c", getc());
+	executeCommand(buffer);
     }
 }
 
 void kernel_main() {
+    auxInit();
     logo();
     clear_bss();
     esp_printf(putc, "Current EL: %d\n", getEL());
@@ -55,7 +77,6 @@ void kernel_main() {
 	    return;
     }
     success("MMU INITIALIZED\n");
-
     /* Initialize FAT filesystem
 
     if (fatInit() != 0) {

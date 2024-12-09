@@ -14,25 +14,56 @@ static char pad_character;
 #define UART_LSR_RXFE (1 << 0)
 volatile int *muio_ptr = (volatile int *)(AUX_MU_IO);
 
-void putc(int data){
-   if (muio_ptr != NULL) *muio_ptr = data;
+void auxInit(){
+    register unsigned int r;
+
+    *AUX_ENABLE |=1;       // enable UART1, AUX mini uart
+    *AUX_MU_CNTL = 0;
+    *AUX_MU_LCR = 3;       // 8 bits
+    *AUX_MU_MCR = 0;
+    *AUX_MU_IER = 0;
+    *AUX_MU_IIR = 0xc6;    // disable interrupts
+    *AUX_MU_BAUD = 270;    // 115200 baud
+    /* map UART1 to GPIO pins */
+    r=*GPFSEL1;
+    r&=~((7<<12)|(7<<15)); // gpio14, gpio15
+    r|=(2<<12)|(2<<15);    // alt5
+    *GPFSEL1 = r;
+    *GPPUD = 0;            // enable pins 14 and 15
+    r=150; while(r--) { asm volatile("nop"); }
+    *GPPUDCLK0 = (1<<14)|(1<<15);
+    r=150; while(r--) { asm volatile("nop"); }
+    *GPPUDCLK0 = 0;        // flush GPIO setup
+    *AUX_MU_CNTL = 3;      // enable Tx, Rx
 }
 
-/*
-char getc(){
-	while (!(*AUX_MU_LSR&0x01)) asm volatile("nop");
-	char c = (char)(*AUX_MU_IO);
-	if (c=='\r') return '\n'; 
-   return c;
+void putc(int data){
+	do{asm volatile("nop");}while(!(*AUX_MU_LSR&0x20));   
+	*AUX_MU_IO=data;
 }
-*/
+
+
+char getc(){
+    char r;
+    /* wait until something is in the buffer */
+    do{asm volatile("nop");}while(!(*AUX_MU_LSR&0x01));
+    /* read it and return */
+    r=(char)(*AUX_MU_IO);
+    /* convert carriage return to newline */
+    return r=='\r'?'\n':r;
+}
+/*
 char getc(){
  	while (!(*AUX_MU_LSR & 0x01)) {
 		asm volatile("nop");
 	}
-        esp_printf(putc, "data available");
-	return (char)(*AUX_MU_IO & 0xFF);
+	char c = (char)(*AUX_MU_IO & 0xFF);
+	if (c =='\r'){
+		return '\n';
+	}
+	return c;
 }
+*/
 char getc_NB(){
     if (*AUX_MU_LSR & 0x01){
         char received_char = (char)(*AUX_MU_IO & 0xFF);  // Read the received byte

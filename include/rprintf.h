@@ -22,7 +22,7 @@ typedef unsigned int  size_t;
 #define CYAN "\033[0;36m"
 #define WHITE "\033[0;37m"
 
-
+void auxInit();
 void putc(int data);
 char getc();
 char getc_NB();

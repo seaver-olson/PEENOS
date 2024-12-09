@@ -23,8 +23,7 @@
 #define GPPUDCLK0       ((volatile unsigned int*)(MMIO_BASE+0x00200098))
 #define GPPUDCLK1       ((volatile unsigned int*)(MMIO_BASE+0x0020009C))
 
-#define AUX_OFFSET 	0x00215000
-#define AUX_ENABLE      ((volatile unsigned int*)(MMIO_BASE+AUX_OFFSET+4))//test
+#define AUX_ENABLE      ((volatile unsigned int*)(MMIO_BASE+0x00215004))
 #define AUX_MU_IO       ((volatile unsigned int*)(MMIO_BASE+0x00215040))
 #define AUX_MU_IER      ((volatile unsigned int*)(MMIO_BASE+0x00215044))
 #define AUX_MU_IIR      ((volatile unsigned int*)(MMIO_BASE+0x00215048))
