@@ -43,7 +43,7 @@ void executeCommand(char *command) {
     } else if (strcmp(command, "meminfo") == 0) {
         meminfo();
     } else {
-        esp_printf(putc, "Unknown command: %s\n", command);
+        esp_printf(putc, "Cock Blocked at: %s\n", command);
     }
 }
 
