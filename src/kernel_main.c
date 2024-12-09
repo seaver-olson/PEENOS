@@ -49,7 +49,7 @@ void pShell(){
 	if (strlen(buffer) == 0){
 		warning("Recieved empty command");
 	}
-	esp_printf(putc, "&c", getc());
+	putc(getc());
 	executeCommand(buffer);
     }
 }
@@ -101,12 +101,8 @@ void kernel_main() {
     }
     success("SD CARD READ SUCCESSFUL\n");
     */
-    //pShell();
+    pShell();
     while (1) {
-        char c = getc();
-        if (c > 0) { // Ensure valid input
-            putc(c); // Echo back
-        }
     }
     esp_printf(putc,"terminating");
 }
