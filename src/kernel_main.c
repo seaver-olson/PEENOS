@@ -22,38 +22,6 @@ void executeCommand(char *command) {
     }
 }
 
-void readLine(char *buffer){
-    char c;
-    int i=0;
-    while(1){
-        c=getc();
-        if(c=='\n'){
-            buffer[i]='\0';
-            return;
-        }
-        buffer[i]=c;
-        i++;
-	if (i >= CMD_BUFFER_SIZE - 1) { 
-		buffer[i] = '\0';
-        	esp_printf(putc, "Input too long. Truncated to: %s\n", buffer);
-                return;
-	}
-    }
-}
-
-void pShell(){
-    
-    while(1){
-        
-        readLine(buffer);
-	if (strlen(buffer) == 0){
-		warning("Recieved empty command");
-	}
-	putc(getc());
-	executeCommand(buffer);
-    }
-}
-
 void kernel_main() {
     char buffer[CMD_BUFFER_SIZE];
 
@@ -64,8 +32,7 @@ void kernel_main() {
     //unsigned char writeBuffer[512];
     //unsigned char readBuffer[512];
     // Initialize timer and enable IRQ
-    /*
-    timer_setup(1);
+    //timer_setup(1);
     success("TIMER SETUP");
     interrupt_setup();
     asm("msr DAIFClr, #2");
@@ -80,7 +47,7 @@ void kernel_main() {
 	    return;
     }
     success("MMU INITIALIZED\n");
-     Initialize FAT filesystem
+    /* Initialize FAT filesystem
 
     if (fatInit() != 0) {
         fail("[ERROR] FAT INIT FAILED");
@@ -108,9 +75,10 @@ void kernel_main() {
         char c = getc();
         if (c == '\n') {
             esp_printf(putc, "\nPEENOS 8==> ");
-            break;
         }
-        putc(c);
+        else {
+		putc(c);
+	}
     }
     esp_printf(putc,"terminating");
 }
