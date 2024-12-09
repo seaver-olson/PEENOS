@@ -1,0 +1,2 @@
+void clearScreen();
+void meminfo();

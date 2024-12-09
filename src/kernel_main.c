@@ -10,20 +10,22 @@
 
 #define CMD_BUFFER_SIZE 512
 
-void clearScreen(){
-    esp_printf(putc, "\033[2J\033[H");
-}
+
+
 
 void executeCommand(char *command) {
     if (strcmp(command, "help") == 0) {
         esp_printf(putc, "Available commands:\n");
         esp_printf(putc, "  help - Show this help message\n");
         esp_printf(putc, "  logo - Display the logo\n");
-        esp_printf(putc, " clear - Clear the screen\n");
+        esp_printf(putc, "  clear - Clear the screen\n");
+        esp_printf(putc, "  meminfo - Display memory information\n");
     } else if (strcmp(command, "clear") == 0) {
         clearScreen();
     } else if (strcmp(command, "logo") == 0) {
         logo();
+    } else if (strcmp(command, "meminfo") == 0) {
+        meminfo();
     } else {
         esp_printf(putc, "Unknown command: %s\n", command);
     }

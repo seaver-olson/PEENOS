@@ -9,3 +9,6 @@ struct ppage *remove_page_from_list(struct ppage **list);
 void init_pfa_list(void);
 struct ppage *allocate_physical_pages(unsigned int npages);
 void free_physical_pages(struct ppage *ppage_list);
+unsigned int get_total_pages();
+unsigned int get_used_pages();
+unsigned int get_free_pages();
