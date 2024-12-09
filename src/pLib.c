@@ -27,3 +27,4 @@ void meminfo() {
     esp_printf(putc, "  Used Memory: %d KB\n", used_pages * page_size_kb);
     esp_printf(putc, "  Free Memory: %d KB\n", free_pages * page_size_kb);
 }
+
