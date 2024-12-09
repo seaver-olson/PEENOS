@@ -44,12 +44,14 @@ void putc(int data){
 
 
 char getc(){
+    int tries=10000;
     char r;
-    /* wait until something is in the buffer */
-    do{asm volatile("nop");}while(!(*AUX_MU_LSR&0x01));
-    /* read it and return */
+    while (!(*AUX_MU_LSR & 0x01)){
+        if (tries--==0){
+            return 0;
+        }
+    }
     r=(char)(*AUX_MU_IO);
-    /* convert carriage return to newline */
     return r=='\r'?'\n':r;
 }
 /*

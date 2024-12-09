@@ -62,6 +62,7 @@ void kernel_main() {
     //unsigned char writeBuffer[512];
     //unsigned char readBuffer[512];
     // Initialize timer and enable IRQ
+    /*
     timer_setup(1);
     success("TIMER SETUP");
     interrupt_setup();
@@ -77,7 +78,7 @@ void kernel_main() {
 	    return;
     }
     success("MMU INITIALIZED\n");
-    /* Initialize FAT filesystem
+     Initialize FAT filesystem
 
     if (fatInit() != 0) {
         fail("[ERROR] FAT INIT FAILED");
@@ -100,8 +101,12 @@ void kernel_main() {
     }
     success("SD CARD READ SUCCESSFUL\n");
     */
-    pShell();
+    //pShell();
     while (1) {
+        char c = getc();
+        if (c > 0) { // Ensure valid input
+            putc(c); // Echo back
+        }
     }
     esp_printf(putc,"terminating");
 }
