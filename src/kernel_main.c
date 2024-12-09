@@ -42,9 +42,9 @@ void readLine(char *buffer){
 }
 
 void pShell(){
-    char buffer[CMD_BUFFER_SIZE];
+    
     while(1){
-        esp_printf(putc, "PEENOS 8==> ");
+        
         readLine(buffer);
 	if (strlen(buffer) == 0){
 		warning("Recieved empty command");
@@ -55,6 +55,8 @@ void pShell(){
 }
 
 void kernel_main() {
+    char buffer[CMD_BUFFER_SIZE];
+
     auxInit();
     logo();
     clear_bss();
@@ -101,8 +103,14 @@ void kernel_main() {
     }
     success("SD CARD READ SUCCESSFUL\n");
     */
-    pShell();
+    esp_printf(putc, "PEENOS 8==> ");
     while (1) {
+        char c = getc();
+        if (c == '\n') {
+            esp_printf(putc, "\nPEENOS 8==> ");
+            break;
+        }
+        putc(c);
     }
     esp_printf(putc,"terminating");
 }
