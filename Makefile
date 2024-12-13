@@ -1,5 +1,3 @@
-
-
 CC := aarch64-linux-gnu-gcc
 LD := aarch64-linux-gnu-ld
 OBJDUMP := aarch64-linux-gnu-objdump

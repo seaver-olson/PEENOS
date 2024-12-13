@@ -1,8 +1,14 @@
 #include <stdint.h>
 
-#define MMIO_BASE       0x3F000000
+//if using raspberry pi 4 or 5 please add -DRPI4 to the compiler flags in the makefile sorry not smart enough right now to make it automatic
+#if defined(RPI4)
+    #define MMIO_BASE 0xFE000000
+#else
+    #define MMIO_BASE 0x3F000000
+#endif
+
 #define GPIO_BASE       (MMIO_BASE + 0x200000)
-#define TIMER_BASE      ((volatile unsigned int*)0x3F003000)
+#define TIMER_BASE      (MMIO_BASE + 0x3000)
 
 #define GPFSEL0         ((volatile unsigned int*)(MMIO_BASE+0x00200000))
 #define GPFSEL1         ((volatile unsigned int*)(MMIO_BASE+0x00200004))
