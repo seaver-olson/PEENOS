@@ -1,3 +1,4 @@
 void clearScreen();
 void meminfo();
-void littleguy();
+void cat(char *filename);
+void man(char *command);
