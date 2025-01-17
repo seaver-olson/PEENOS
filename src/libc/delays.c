@@ -19,6 +19,7 @@ unsigned long get_timer_count() {
 	unsigned long *timer_count_register = (unsigned long *)0x3f003004;
   	return *timer_count_register;
 }
+
 void wait_msec(unsigned int ms) {
    unsigned long start_time = get_timer_count();
    unsigned long target_time = start_time + ms;

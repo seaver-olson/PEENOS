@@ -61,7 +61,7 @@ void kernel_main() {
     clear_bss();
     esp_printf(putc, "Current EL: %d\n", getEL());
     //Initialize timer and enable IRQ
-    //timer_setup(1);//  broken becuase of qemu
+    timer_setup(1);
     success("TIMER SETUP");
     interrupt_setup();
     asm("msr DAIFClr, #2");
@@ -76,14 +76,13 @@ void kernel_main() {
 	    return;
     }
     success("MMU INITIALIZED\n");
-    warning("FAT system down for service\n");
-    /* Initialize FAT filesystem
+    // Initialize FAT filesystem
     if (fatInit() != 0) {
         fail("[ERROR] FAT INIT FAILED");
         return;
     }
     success("FAT SYSTEM INITIALIZED\n");
-     Test SD card write and read
+    //Test SD card write and read
     memcpy(writeBuffer, "Test data for SD card write", strlen("Test data for SD card write"));
     success("prepping for write...");
     if (sd_writeblock(writeBuffer, 0, 1) != 0) {
@@ -97,7 +96,7 @@ void kernel_main() {
         return;
     }
     success("SD CARD READ SUCCESSFUL\n");
-    */
+
     esp_printf(putc, "PEENOS 8==> ");
     while (running) {
         char c = getc();

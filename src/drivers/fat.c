@@ -6,7 +6,7 @@ unsigned char fat_table[8*SECTOR_SIZE];
 unsigned int actual_data_sector;
 unsigned int root_sector;
 
-int fatInit() {  
+int fatInit() {
     if (sd_init() != 0) {
         esp_printf(putc, "[WARNING]: SD card initialization failed\n");
         return -1;

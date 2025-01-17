@@ -70,10 +70,10 @@ int sd_cmd(unsigned int code, unsigned int arg)
    }
     if(sd_status(SR_CMD_INHIBIT)) { fail("ERROR : EMMC BUSY\n"); sd_err= SD_TIMEOUT;return 0;}
     
-    //esp_printf(putc,"EMMC: Sending command ");
-    //esp_printf(putc,"%x : %x\n",code,arg);
+    esp_printf(putc,"EMMC: Sending command ");
+    esp_printf(putc,"%x : %x\n",code,arg);
     *EMMC_INTERRUPT=*EMMC_INTERRUPT; *EMMC_ARG1=arg; *EMMC_CMDTM=code;
-    if(code==CMD_SEND_OP_COND) //wait_msec(1000); else
+    if(code==CMD_SEND_OP_COND) wait_msec(1000); else
     if(code==CMD_SEND_IF_COND || code==CMD_APP_CMD) wait_msec(100);
     if((r=sd_int(INT_CMD_DONE))) {
     fail("Failed to send EMMC command\n");
@@ -171,13 +171,13 @@ int sd_clk(unsigned int f)
 {
     unsigned int d,c=41666666/f,x,s=32,h=0;
     int cnt = 100000;
-    while((*EMMC_STATUS & (SR_CMD_INHIBIT|SR_DAT_INHIBIT)) && cnt--); //wait_msec(1);
+    while((*EMMC_STATUS & (SR_CMD_INHIBIT|SR_DAT_INHIBIT)) && cnt--); wait_msec(1);
     if(cnt<=0) {
 	fail("ERROR: timeout waiting for inhibit flag\n");
     return SD_ERROR;
     }
 
-    *EMMC_CONTROL1 &= ~C1_CLK_EN; //wait_msec(10);
+    *EMMC_CONTROL1 &= ~C1_CLK_EN; wait_msec(10);
     x=c-1; if(!x) s=0; else {
         if(!(x & 0xffff0000u)) { x <<= 16; s -= 16; }
         if(!(x & 0xff000000u)) { x <<= 8;  s -= 8; }
@@ -195,9 +195,9 @@ int sd_clk(unsigned int f)
     esp_printhex(s);
     if(sd_hv>HOST_SPEC_V2) h=(d&0x300)>>2;
     d=(((d&0x0ff)<<8)|h);
-    *EMMC_CONTROL1=(*EMMC_CONTROL1&0xffff003f)|d; //wait_msec(10);
-    *EMMC_CONTROL1 |= C1_CLK_EN; //wait_msec(10);
-    cnt=10000; while(!(*EMMC_CONTROL1 & C1_CLK_STABLE) && cnt--) //wait_msec(10);
+    *EMMC_CONTROL1=(*EMMC_CONTROL1&0xffff003f)|d; wait_msec(10);
+    *EMMC_CONTROL1 |= C1_CLK_EN; wait_msec(10);
+    cnt=10000; while(!(*EMMC_CONTROL1 & C1_CLK_STABLE) && cnt--);wait_msec(10);
     if(cnt<=0) {
 	fail("ERROR: failed to get stable clock\n");
 	return SD_ERROR;
@@ -210,27 +210,25 @@ int sd_clk(unsigned int f)
  */
 int sd_init()
 {
-    
     long r,cnt,ccs=0; // r is for return value, cnt is for timeout counter and ccs is for card capacity
     // GPIO_CD
     r=*GPFSEL4; r&=~(7<<(7*3)); *GPFSEL4=r; // GPIO 47 is input
-    *GPPUD=2; 
-    //wait_msec(150);
+    *GPPUD=2;
+    wait_msec(150);
     *GPPUDCLK1=(1<<15);
-    //wait_msec(150); 
+    wait_msec(150); 
     *GPPUD=0; 
     *GPPUDCLK1=0;
     r=*GPHEN1; r|=1<<15; *GPHEN1=r;
 
     // GPIO_CLK, GPIO_CMD
     r=*GPFSEL4; r|=(7<<(8*3))|(7<<(9*3)); *GPFSEL4=r;
-    *GPPUD=2; //wait_msec(150); *GPPUDCLK1=(1<<16)|(1<<17); //wait_msec(150); *GPPUD=0; *GPPUDCLK1=0;
-    
+    *GPPUD=2; wait_msec(150); *GPPUDCLK1=(1<<16)|(1<<17); wait_msec(150); *GPPUD=0; *GPPUDCLK1=0;
     // GPIO_DAT0, GPIO_DAT1, GPIO_DAT2, GPIO_DAT3
     r=*GPFSEL5; r|=(7<<(0*3)) | (7<<(1*3)) | (7<<(2*3)) | (7<<(3*3)); *GPFSEL5=r;
-    *GPPUD=2; //wait_msec(150);
+    *GPPUD=2; wait_msec(150);
     *GPPUDCLK1=(1<<18) | (1<<19) | (1<<20) | (1<<21);
-    //wait_msec(150); 
+    wait_msec(150); 
     *GPPUD=0; *GPPUDCLK1=0;
    
     sd_hv = (*EMMC_SLOTISR_VER & HOST_SPEC_NUM) >> HOST_SPEC_NUM_SHIFT;
@@ -244,7 +242,7 @@ int sd_init()
     }
     success("EMMC: reset OK\n");
     *EMMC_CONTROL1 |= C1_CLK_INTLEN | C1_TOUNIT_MAX;
-    //wait_msec(10);
+    wait_msec(10);
     // Set clock to setup frequency.
     if((r=sd_clk(400000))) return r;
     *EMMC_INT_EN   = 0xffffffff;
@@ -300,8 +298,8 @@ int sd_init()
     r=0; cnt=100000; while(r<2 && cnt) {
         if( *EMMC_STATUS & SR_READ_AVAILABLE )
             sd_scr[r++] = *EMMC_DATA;
-	//else
-            //wait_msec(1);
+	else
+            wait_msec(1);
     }
     if(r!=2) return SD_TIMEOUT;
     if(sd_scr[0] & SCR_SD_BUS_WIDTH_4) {
